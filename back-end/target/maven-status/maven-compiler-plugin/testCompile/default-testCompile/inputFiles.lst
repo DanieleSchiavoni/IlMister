@@ -1,0 +1,16 @@
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/IlMisterApplicationTests.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/controller/SviluppoControllerTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/entity/GiocatoreTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/entity/ModuloTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/entity/PosizioneTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/generazione/CalcolatoreAttributiTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/generazione/GeneratoreCampionatoTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/CarrieraRepositoryTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/ClassificaRepositoryTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/FormazioneGiocatoreRepositoryTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/GiocatoreRepositoryTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/MappaturaEntityTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/RepositoryTestBase.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/repository/UtenteERefreshTokenRepositoryTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/service/AnteprimaServiceImplTest.java
+/Users/danieleschiavoni/CORSO/Progetti/Il Mister/back-end/src/test/java/com/ilmister/service/CarrieraServiceImplTest.java
