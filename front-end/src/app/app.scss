@@ -1,0 +1,11 @@
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--superficie);
+  border-bottom: 1px solid var(--bordo);
+}
+.logo { font-weight: 700; font-size: 1.15rem; color: var(--testo); }
+.menu { display: flex; align-items: center; gap: 1rem; }

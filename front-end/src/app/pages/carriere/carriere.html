@@ -1,0 +1,43 @@
+<div class="intestazione">
+  <h1>Le tue carriere</h1>
+  <a class="pulsante" routerLink="/carriere/nuova">Nuova carriera</a>
+</div>
+
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+
+@if (carriere(); as elenco) {
+  @if (elenco.length === 0) {
+    <div class="scheda vuoto">
+      <p>Non hai ancora nessuna carriera.</p>
+      <p class="tenue">Scegli una squadra e inizia la tua prima stagione.</p>
+    </div>
+  } @else {
+    <div class="griglia">
+      @for (carriera of elenco; track carriera.id) {
+        <article class="scheda">
+          <h2>{{ carriera.nome }}</h2>
+          <p class="tenue">{{ carriera.nomeAllenatore }} · {{ carriera.squadra }}</p>
+          <dl>
+            <dt>Campionato</dt><dd>{{ carriera.campionato }}</dd>
+            <dt>Stagione</dt><dd>{{ carriera.stagione }}</dd>
+            <dt>Data</dt><dd>{{ carriera.dataCorrente | date: 'dd/MM/yyyy' }}</dd>
+            <dt>Giornata</dt>
+            <dd>
+              @if (carriera.prossimaGiornata) {
+                {{ carriera.prossimaGiornata }} di {{ carriera.giornateTotali }}
+              } @else {
+                Stagione conclusa
+              }
+            </dd>
+            <dt>Fiducia presidente</dt><dd>{{ carriera.fiduciaPresidente }}%</dd>
+          </dl>
+          <button class="pulsante pericolo" type="button" (click)="elimina(carriera)">Elimina</button>
+        </article>
+      }
+    </div>
+  }
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}

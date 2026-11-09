@@ -1,0 +1,55 @@
+<h1>Nuova carriera</h1>
+
+<form class="scheda" [formGroup]="form" (ngSubmit)="inizia()">
+  <div class="riga">
+    <div class="campo">
+      <label for="nome">Nome della carriera</label>
+      <input id="nome" formControlName="nome" placeholder="Es. La scalata">
+    </div>
+    <div class="campo">
+      <label for="allenatore">Il tuo nome da allenatore</label>
+      <input id="allenatore" formControlName="nomeAllenatore">
+    </div>
+  </div>
+
+  <div class="titolo-squadre">
+    <h2>{{ anteprima()?.nome ?? 'Campionato' }}</h2>
+    <button class="pulsante secondario" type="button" (click)="rigenera()">Genera un altro campionato</button>
+  </div>
+
+  @if (anteprima(); as campionato) {
+    <table class="tabella">
+      <thead>
+        <tr><th></th><th>Squadra</th><th>Città</th><th>Stadio</th><th>Forza</th><th>Reputazione</th></tr>
+      </thead>
+      <tbody>
+        @for (squadra of campionato.squadre; track squadra.indice) {
+          <tr [class.scelta]="squadraScelta() === squadra.nome" (click)="squadraScelta.set(squadra.nome)">
+            <td>
+              <input type="radio" name="squadra" [checked]="squadraScelta() === squadra.nome"
+                [attr.aria-label]="'Scegli ' + squadra.nome" (change)="squadraScelta.set(squadra.nome)">
+            </td>
+            <td>{{ squadra.nome }}</td>
+            <td>{{ squadra.citta }}</td>
+            <td>{{ squadra.stadio }} ({{ squadra.capienza }})</td>
+            <td>{{ squadra.forzaMedia.toFixed(1) }}</td>
+            <td>{{ squadra.reputazione }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else if (!errore()) {
+    <p class="tenue">Caricamento...</p>
+  }
+
+  @if (errore(); as messaggio) {
+    <p class="errore" role="alert">{{ messaggio }}</p>
+  }
+
+  <div class="azioni">
+    <a class="pulsante secondario" routerLink="/carriere">Annulla</a>
+    <button class="pulsante" type="submit" [disabled]="form.invalid || !squadraScelta() || inCorso()">
+      Inizia la carriera
+    </button>
+  </div>
+</form>

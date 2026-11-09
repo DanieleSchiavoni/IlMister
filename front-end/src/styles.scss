@@ -1,0 +1,80 @@
+/* Stile globale: tema scuro, variabili e componenti base riusati da tutte le pagine */
+:root {
+  --sfondo: #0e1217;
+  --superficie: #171d25;
+  --superficie-2: #1f2732;
+  --bordo: #2a3441;
+  --testo: #e6ebf2;
+  --testo-tenue: #93a1b5;
+  --primario: #2fbf71;
+  --primario-scuro: #23995a;
+  --pericolo: #e5594f;
+  --avviso: #e8b04a;
+  --raggio: 10px;
+  --ombra: 0 6px 24px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; min-height: 100%; }
+
+body {
+  background: var(--sfondo);
+  color: var(--testo);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3 { margin: 0 0 0.5rem; line-height: 1.2; }
+a { color: var(--primario); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.contenitore { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+.scheda {
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  padding: 1.25rem;
+  box-shadow: var(--ombra);
+}
+
+.campo { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
+.campo label { font-size: 0.85rem; color: var(--testo-tenue); }
+
+input, select {
+  background: var(--superficie-2);
+  color: var(--testo);
+  border: 1px solid var(--bordo);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+}
+input:focus, select:focus { outline: 2px solid var(--primario); outline-offset: 1px; }
+
+.pulsante {
+  background: var(--primario);
+  color: #06210f;
+  border: 0;
+  border-radius: 8px;
+  padding: 0.6rem 1.1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.pulsante:hover:not(:disabled) { background: var(--primario-scuro); }
+.pulsante:disabled { opacity: 0.5; cursor: not-allowed; }
+.pulsante.secondario { background: var(--superficie-2); color: var(--testo); border: 1px solid var(--bordo); }
+.pulsante.pericolo { background: var(--pericolo); color: #fff; }
+
+.errore { color: var(--pericolo); font-size: 0.9rem; margin: 0 0 1rem; }
+.tenue { color: var(--testo-tenue); }
+
+.tabella { width: 100%; border-collapse: collapse; }
+.tabella th, .tabella td { text-align: left; padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--bordo); }
+.tabella th { color: var(--testo-tenue); font-weight: 500; font-size: 0.85rem; }
+
+@media (max-width: 600px) {
+  .contenitore { padding: 1rem 0.75rem; }
+}

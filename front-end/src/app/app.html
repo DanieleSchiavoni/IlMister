@@ -1,0 +1,13 @@
+<header class="barra">
+  <a class="logo" routerLink="/">⚽ Il Mister</a>
+  @if (auth.utente(); as utente) {
+    <nav class="menu">
+      <a routerLink="/carriere">Carriere</a>
+      <span class="tenue">{{ utente.username }}</span>
+      <button class="pulsante secondario" type="button" (click)="esci()">Esci</button>
+    </nav>
+  }
+</header>
+<main class="contenitore">
+  <router-outlet />
+</main>

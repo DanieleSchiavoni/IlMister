@@ -1,0 +1,8 @@
+.riga { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.titolo-squadre { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--superficie-2); }
+tbody tr.scelta { background: rgba(47, 191, 113, 0.15); }
+.azioni { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; }
+.azioni a { display: inline-flex; align-items: center; color: var(--testo); text-decoration: none; }
+@media (max-width: 600px) { .riga { grid-template-columns: 1fr; } }

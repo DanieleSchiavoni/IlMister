@@ -1,0 +1,6 @@
+.intestazione { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.griglia { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.vuoto { text-align: center; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0 0 1rem; }
+dt { color: var(--testo-tenue); }
+dd { margin: 0; text-align: right; }

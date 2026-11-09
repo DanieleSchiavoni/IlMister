@@ -1,0 +1,19 @@
+<section class="scheda pagina-stretta">
+  <h1>Accedi</h1>
+  <p class="tenue">Entra per continuare la tua carriera da allenatore.</p>
+  <form [formGroup]="form" (ngSubmit)="accedi()">
+    <div class="campo">
+      <label for="identificativo">Username o email</label>
+      <input id="identificativo" formControlName="identificativo" autocomplete="username">
+    </div>
+    <div class="campo">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password" autocomplete="current-password">
+    </div>
+    @if (errore(); as messaggio) {
+      <p class="errore" role="alert">{{ messaggio }}</p>
+    }
+    <button class="pulsante" type="submit" [disabled]="form.invalid || inCorso()">Accedi</button>
+  </form>
+  <p class="tenue">Non hai un account? <a routerLink="/registrazione">Registrati</a></p>
+</section>
