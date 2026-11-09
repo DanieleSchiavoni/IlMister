@@ -269,3 +269,59 @@ export interface PrimoTempo {
   cronaca: string[];
   giocatoriUtente: SituazioneGiocatore[];
 }
+
+export type FocusAllenamento = 'EQUILIBRATO' | 'FISICO' | 'TECNICO' | 'DIFENSIVO' | 'OFFENSIVO';
+export type RuoloGiocatore = 'PORTIERE' | 'DIFENSORE' | 'CENTROCAMPISTA' | 'ATTACCANTE';
+
+export interface GiocatoreMercato {
+  id: number;
+  nome: string;
+  cognome: string;
+  siglaPosizione: string;
+  ruolo: RuoloGiocatore;
+  eta: number;
+  valutazione: number;
+  potenziale: number;
+  valoreMercato: number;
+  stipendioAnnuo: number;
+  scadenzaContratto: string;
+  squadraId: number | null;
+  squadra: string | null;
+}
+
+export interface EsitoTrattativa {
+  conclusa: boolean;
+  messaggio: string;
+  budgetResiduo: number;
+}
+
+export type TipoMovimento = 'BIGLIETTI' | 'STIPENDI' | 'ACQUISTO' | 'VENDITA';
+
+export interface Movimento {
+  id: number;
+  data: string;
+  tipo: TipoMovimento;
+  importo: number;
+  descrizione: string;
+}
+
+export interface Finanze {
+  budget: number;
+  monteStipendiAnnuo: number;
+  valoreRosa: number;
+  giocatori: number;
+  entrateTotali: number;
+  usciteTotali: number;
+  movimenti: Movimento[];
+}
+
+export interface OpzioneFocus {
+  valore: FocusAllenamento;
+  nome: string;
+  descrizione: string;
+}
+
+export interface Allenamento {
+  focus: FocusAllenamento;
+  opzioni: OpzioneFocus[];
+}

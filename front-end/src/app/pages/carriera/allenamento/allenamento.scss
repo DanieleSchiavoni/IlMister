@@ -1,0 +1,9 @@
+.opzioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-top: 1rem; }
+.opzione {
+  display: flex; flex-direction: column; gap: 0.25rem; text-align: left; cursor: pointer;
+  background: var(--superficie-2); color: var(--testo); border: 1px solid var(--bordo);
+  border-radius: var(--raggio); padding: 0.9rem; font: inherit;
+}
+.opzione:hover { border-color: var(--primario); }
+.opzione.scelta { border-color: var(--primario); background: rgba(47, 191, 113, 0.15); }
+.ok { color: var(--primario); }

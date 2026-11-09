@@ -4,7 +4,13 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import {
+  Allenamento,
   Carriera,
+  EsitoTrattativa,
+  Finanze,
+  FocusAllenamento,
+  GiocatoreMercato,
+  RuoloGiocatore,
   DecisioniIntervallo,
   Formazione,
   FormazioneRichiesta,
@@ -66,5 +72,53 @@ export class GiocoService {
   /** Gioca il secondo tempo con le decisioni dell'intervallo e poi il resto della giornata */
   concludi(id: number, decisioni: DecisioniIntervallo): Observable<GiornataGiocata> {
     return this.http.post<GiornataGiocata>(`${this.base}/${id}/partita/conclusione`, decisioni);
+  }
+
+  // ---------- mercato, finanze, allenamento ----------
+
+  cercaGiocatori(id: number, ruolo: RuoloGiocatore | '', nome: string, valoreMassimo: number | null): Observable<GiocatoreMercato[]> {
+    let params = new HttpParams();
+    if (ruolo) {
+      params = params.set('ruolo', ruolo);
+    }
+    if (nome.trim()) {
+      params = params.set('nome', nome.trim());
+    }
+    if (valoreMassimo !== null) {
+      params = params.set('valoreMassimo', valoreMassimo);
+    }
+    return this.http.get<GiocatoreMercato[]>(`${this.base}/${id}/mercato/giocatori`, { params });
+  }
+
+  svincolati(id: number): Observable<GiocatoreMercato[]> {
+    return this.http.get<GiocatoreMercato[]>(`${this.base}/${id}/mercato/svincolati`);
+  }
+
+  offri(id: number, giocatoreId: number, importo: number): Observable<EsitoTrattativa> {
+    return this.http.post<EsitoTrattativa>(`${this.base}/${id}/mercato/offerte`, { giocatoreId, importo });
+  }
+
+  vendi(id: number, giocatoreId: number): Observable<EsitoTrattativa> {
+    return this.http.post<EsitoTrattativa>(`${this.base}/${id}/mercato/vendite`, { giocatoreId });
+  }
+
+  svincola(id: number, giocatoreId: number): Observable<EsitoTrattativa> {
+    return this.http.post<EsitoTrattativa>(`${this.base}/${id}/mercato/svincoli`, { giocatoreId });
+  }
+
+  ingaggia(id: number, giocatoreId: number): Observable<EsitoTrattativa> {
+    return this.http.post<EsitoTrattativa>(`${this.base}/${id}/mercato/ingaggi`, { giocatoreId });
+  }
+
+  finanze(id: number): Observable<Finanze> {
+    return this.http.get<Finanze>(`${this.base}/${id}/finanze`);
+  }
+
+  allenamento(id: number): Observable<Allenamento> {
+    return this.http.get<Allenamento>(`${this.base}/${id}/allenamento`);
+  }
+
+  impostaFocus(id: number, focus: FocusAllenamento): Observable<Allenamento> {
+    return this.http.put<Allenamento>(`${this.base}/${id}/allenamento`, { focus });
   }
 }

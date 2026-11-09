@@ -45,6 +45,18 @@ export const routes: Routes = [
         path: 'intervallo',
         loadComponent: () => import('./pages/carriera/intervallo/intervallo').then((m) => m.Intervallo),
       },
+      {
+        path: 'mercato',
+        loadComponent: () => import('./pages/carriera/mercato/mercato').then((m) => m.Mercato),
+      },
+      {
+        path: 'finanze',
+        loadComponent: () => import('./pages/carriera/finanze/finanze').then((m) => m.Finanze),
+      },
+      {
+        path: 'allenamento',
+        loadComponent: () => import('./pages/carriera/allenamento/allenamento').then((m) => m.Allenamento),
+      },
       { path: 'rosa', loadComponent: () => import('./pages/carriera/rosa/rosa').then((m) => m.Rosa) },
       {
         path: 'partite/:partitaId',

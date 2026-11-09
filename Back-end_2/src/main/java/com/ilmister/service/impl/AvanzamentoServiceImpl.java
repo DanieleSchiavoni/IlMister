@@ -26,6 +26,7 @@ import com.ilmister.entity.Formazione;
 import com.ilmister.entity.FormazioneGiocatore;
 import com.ilmister.entity.Giocatore;
 import com.ilmister.entity.Giornata;
+import com.ilmister.entity.MovimentoFinanziario;
 import com.ilmister.entity.Partita;
 import com.ilmister.entity.PrestazioneGiocatore;
 import com.ilmister.entity.Squadra;
@@ -34,6 +35,9 @@ import com.ilmister.entity.StatisticaPartita;
 import com.ilmister.entity.VoceClassifica;
 import com.ilmister.entity.enumerazioni.Modulo;
 import com.ilmister.entity.enumerazioni.StatoPartita;
+import com.ilmister.generazione.GeneratoreCampionato;
+import com.ilmister.generazione.Attributi;
+import com.ilmister.entity.enumerazioni.TipoMovimento;
 import com.ilmister.entity.enumerazioni.StatoStagione;
 import com.ilmister.exception.OperazioneNonValidaException;
 import com.ilmister.exception.RisorsaNonTrovataException;
@@ -60,6 +64,7 @@ import com.ilmister.repository.FormazioneGiocatoreRepository;
 import com.ilmister.repository.FormazioneRepository;
 import com.ilmister.repository.GiocatoreRepository;
 import com.ilmister.repository.GiornataRepository;
+import com.ilmister.repository.MovimentoFinanziarioRepository;
 import com.ilmister.repository.PartitaRepository;
 import com.ilmister.repository.PrestazioneGiocatoreRepository;
 import com.ilmister.repository.SquadraRepository;
@@ -88,6 +93,7 @@ public class AvanzamentoServiceImpl implements AvanzamentoService {
     private final PrestazioneGiocatoreRepository prestazioneGiocatoreRepository;
     private final FormazioneRepository formazioneRepository;
     private final FormazioneGiocatoreRepository formazioneGiocatoreRepository;
+    private final MovimentoFinanziarioRepository movimentoRepository;
     private final MotorePartita motore;
 
     /** Tutto ciò che serve per giocare la prossima giornata */
@@ -275,6 +281,8 @@ public class AvanzamentoServiceImpl implements AvanzamentoService {
                     partita == partitaUtente));
         }
 
+        applicaEconomiaEAllenamento(carriera, dellUtente, partite, rose, contesto.giornata().getNumero(), data);
+
         carriera.setDataCorrente(data);
         boolean conclusa = partitaRepository.prossimaGiornata(stagione.getId(), campionato.getId(), StatoPartita.CONCLUSA)
                 .isEmpty();
@@ -342,6 +350,83 @@ public class AvanzamentoServiceImpl implements AvanzamentoService {
                 disponibili.stream().map(inCampo).toList(), modulo);
         return new SquadraInCampo(squadra.getId(), squadra.getNome(), modulo, istruzioni, scelta.titolari(),
                 scelta.panchina());
+    }
+
+    /**
+     * Dopo le partite: a ogni squadra si pagano gli stipendi e chi gioca in casa incassa i biglietti
+     * (il bilancio si registra solo per la squadra dell'utente); poi la squadra dell'utente si allena.
+     */
+    private void applicaEconomiaEAllenamento(Carriera carriera, Squadra dellUtente, List<Partita> partite,
+            Map<Long, List<Giocatore>> rose, int numeroGiornata, LocalDate data) {
+        int giornateTotali = 2 * (rose.size() - 1);
+        for (Partita partita : partite) {
+            for (Squadra squadra : List.of(partita.getSquadraCasa(), partita.getSquadraTrasferta())) {
+                List<Giocatore> rosa = rose.getOrDefault(squadra.getId(), List.of());
+                BigDecimal stipendi = RegoleEconomia.stipendiGiornata(
+                        rosa.stream().map(Giocatore::getStipendioAnnuo).toList(), giornateTotali);
+                boolean inCasa = squadra.getId().equals(partita.getSquadraCasa().getId());
+                BigDecimal incasso = inCasa
+                        ? RegoleEconomia.incassoBiglietti(partita.getSpettatori() == null ? 0 : partita.getSpettatori())
+                        : BigDecimal.ZERO;
+                squadra.setBudgetTrasferimenti(squadra.getBudgetTrasferimenti().add(incasso).subtract(stipendi));
+
+                if (squadra.getId().equals(dellUtente.getId())) {
+                    registraMovimento(carriera, squadra, data, TipoMovimento.STIPENDI, stipendi.negate(),
+                            "Stipendi della giornata " + numeroGiornata);
+                    if (inCasa) {
+                        registraMovimento(carriera, squadra, data, TipoMovimento.BIGLIETTI, incasso,
+                                "Biglietti della giornata " + numeroGiornata + " (" + partita.getSpettatori()
+                                        + " spettatori)");
+                    }
+                }
+            }
+        }
+
+        for (Giocatore giocatore : rose.getOrDefault(dellUtente.getId(), List.of())) {
+            if (giocatore.infortunatoAl(data)) {
+                continue;
+            }
+            Attributi attributi = new Attributi(giocatore.getVelocita(), giocatore.getResistenza(),
+                    giocatore.getForza(), giocatore.getTecnica(), giocatore.getPassaggio(), giocatore.getTiro(),
+                    giocatore.getDribbling(), giocatore.getContrasto(), giocatore.getIntelligenza(),
+                    giocatore.getParate());
+            long seme = carriera.getSeme() ^ (numeroGiornata * 0x9E3779B97F4A7C15L)
+                    ^ (giocatore.getId() * 0xC2B2AE3D27D4EB4FL);
+            RegoleAllenamento.prova(carriera.getFocusAllenamento(), giocatore.getPosizione(),
+                    giocatore.etaAl(data), attributi.comeVettore(), giocatore.getValutazione(),
+                    giocatore.getPotenziale(), seme).ifPresent(progresso -> migliora(giocatore, progresso, data));
+        }
+    }
+
+    private void migliora(Giocatore giocatore, RegoleAllenamento.Progresso progresso, LocalDate data) {
+        int valore = progresso.nuovoValore();
+        switch (progresso.attributo()) {
+            case VELOCITA -> giocatore.setVelocita(valore);
+            case RESISTENZA -> giocatore.setResistenza(valore);
+            case FORZA -> giocatore.setForza(valore);
+            case TECNICA -> giocatore.setTecnica(valore);
+            case PASSAGGIO -> giocatore.setPassaggio(valore);
+            case TIRO -> giocatore.setTiro(valore);
+            case DRIBBLING -> giocatore.setDribbling(valore);
+            case CONTRASTO -> giocatore.setContrasto(valore);
+            case INTELLIGENZA -> giocatore.setIntelligenza(valore);
+            case PARATE -> giocatore.setParate(valore);
+        }
+        giocatore.setValutazione(progresso.nuovaValutazione());
+        giocatore.setValoreMercato(GeneratoreCampionato.valoreDiMercato(giocatore.getValutazione(),
+                giocatore.getPotenziale(), giocatore.etaAl(data)));
+    }
+
+    private void registraMovimento(Carriera carriera, Squadra squadra, LocalDate data, TipoMovimento tipo,
+            BigDecimal importo, String descrizione) {
+        MovimentoFinanziario movimento = new MovimentoFinanziario();
+        movimento.setCarriera(carriera);
+        movimento.setSquadra(squadra);
+        movimento.setDataMovimento(data);
+        movimento.setTipo(tipo);
+        movimento.setImporto(importo);
+        movimento.setDescrizione(descrizione);
+        movimentoRepository.save(movimento);
     }
 
     private void registraPartita(Partita partita, RisultatoPartita risultato, Map<Long, List<Giocatore>> rose,

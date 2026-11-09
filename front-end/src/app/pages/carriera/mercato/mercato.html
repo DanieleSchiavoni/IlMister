@@ -1,0 +1,112 @@
+<div class="testata">
+  <nav class="viste" aria-label="Sezioni del mercato">
+    <button type="button" [class.attiva]="vista() === 'cerca'" (click)="scegliVista('cerca')">Cerca giocatori</button>
+    <button type="button" [class.attiva]="vista() === 'svincolati'" (click)="scegliVista('svincolati')">Svincolati</button>
+    <button type="button" [class.attiva]="vista() === 'miei'" (click)="scegliVista('miei')">I miei giocatori</button>
+  </nav>
+  @if (budget() !== null) {
+    <span class="budget">Budget: <strong>{{ budget() | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong></span>
+  }
+</div>
+
+@if (esito(); as e) {
+  <p class="esito" [class.rifiuto]="!e.conclusa" role="status">{{ e.messaggio }}</p>
+}
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+
+@if (vista() === 'cerca') {
+  <form class="scheda filtri" (submit)="$event.preventDefault(); cerca()">
+    <div class="campo">
+      <label for="ruolo">Ruolo</label>
+      <select id="ruolo" (change)="cambiaRuolo($event)">
+        @for (r of ruoli; track r.valore) {
+          <option [value]="r.valore" [selected]="r.valore === ruolo()">{{ r.nome }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo">
+      <label for="nome">Nome</label>
+      <input id="nome" [value]="nome()" (input)="cambiaNome($event)">
+    </div>
+    <div class="campo">
+      <label for="massimo">Valore massimo (€)</label>
+      <input id="massimo" type="number" min="0" step="1000" [value]="valoreMassimo() ?? ''"
+        (input)="cambiaValoreMassimo($event)">
+    </div>
+    <button class="pulsante" type="submit">Cerca</button>
+  </form>
+}
+
+@if (vista() !== 'miei') {
+  @if (trovati(); as elenco) {
+    @if (elenco.length === 0) {
+      <p class="tenue">Nessun giocatore trovato.</p>
+    } @else {
+      <div class="scheda scorrevole">
+        <table class="tabella">
+          <thead>
+            <tr>
+              <th>Giocatore</th><th>Ruolo</th><th class="n">Età</th><th class="n">Val.</th><th class="n">Pot.</th>
+              <th>Squadra</th><th class="n">Valore</th><th class="n">Offerta (€)</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (g of elenco; track g.id) {
+              <tr>
+                <td>{{ g.nome }} {{ g.cognome }}</td>
+                <td>{{ g.siglaPosizione }}</td>
+                <td class="n">{{ g.eta }}</td>
+                <td class="n"><strong>{{ g.valutazione }}</strong></td>
+                <td class="n">{{ g.potenziale }}</td>
+                <td>{{ g.squadra ?? 'Svincolato' }}</td>
+                <td class="n">{{ g.valoreMercato | currency: 'EUR' : 'symbol' : '1.0-0' }}</td>
+                @if (g.squadraId !== null) {
+                  <td class="n">
+                    <input class="importo" type="number" min="1" step="100" [value]="offerta(g)"
+                      [attr.aria-label]="'Offerta per ' + g.cognome" (input)="cambiaOfferta(g, $event)">
+                  </td>
+                  <td><button class="pulsante" type="button" (click)="offri(g)" [disabled]="inCorso()">Offri</button></td>
+                } @else {
+                  <td></td>
+                  <td><button class="pulsante" type="button" (click)="ingaggia(g)" [disabled]="inCorso()">Ingaggia</button></td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  } @else if (!errore()) {
+    <p class="tenue">Caricamento...</p>
+  }
+} @else {
+  @if (miei(); as rosa) {
+    <div class="scheda scorrevole">
+      <table class="tabella">
+        <thead>
+          <tr><th>Giocatore</th><th>Ruolo</th><th class="n">Età</th><th class="n">Val.</th><th class="n">Pot.</th>
+            <th></th></tr>
+        </thead>
+        <tbody>
+          @for (g of rosa; track g.id) {
+            <tr>
+              <td>{{ g.nome }} {{ g.cognome }}</td>
+              <td>{{ g.siglaPosizione }}</td>
+              <td class="n">{{ g.eta }}</td>
+              <td class="n"><strong>{{ g.valutazione }}</strong></td>
+              <td class="n">{{ g.potenziale }}</td>
+              <td class="azioni">
+                <button class="pulsante secondario" type="button" (click)="vendi(g)" [disabled]="inCorso()">Vendi</button>
+                <button class="pulsante pericolo" type="button" (click)="svincola(g)" [disabled]="inCorso()">Svincola</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else if (!errore()) {
+    <p class="tenue">Caricamento...</p>
+  }
+}

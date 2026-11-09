@@ -185,7 +185,7 @@ public class GeneratoreCampionato {
     }
 
     /** Il valore sale del 12% per ogni punto di valutazione; i giovani con potenziale valgono di più, gli anziani meno */
-    static BigDecimal valoreDiMercato(int valutazione, int potenziale, int eta) {
+    public static BigDecimal valoreDiMercato(int valutazione, int potenziale, int eta) {
         double livello = (valutazione + potenziale) / 2.0;
         double valore = 3000 * Math.pow(1.12, livello - 40);
         if (eta >= 33) {

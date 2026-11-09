@@ -21,4 +21,7 @@ public interface FormazioneGiocatoreRepository extends JpaRepository<FormazioneG
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from FormazioneGiocatore f where f.formazione.id = :formazioneId")
     int eliminaPerFormazione(@Param("formazioneId") Long formazioneId);
+
+    /** Il giocatore compare nella formazione salvata della squadra? */
+    boolean existsByFormazioneSquadraIdAndGiocatoreId(Long squadraId, Long giocatoreId);
 }

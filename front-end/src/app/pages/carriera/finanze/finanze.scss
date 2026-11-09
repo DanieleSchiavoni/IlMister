@@ -1,0 +1,7 @@
+.riquadri { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+.riquadro { display: flex; flex-direction: column; gap: 0.25rem; }
+.riquadro strong { font-size: 1.4rem; }
+.scorrevole { overflow-x: auto; }
+.n { text-align: right; white-space: nowrap; }
+.verde { color: var(--primario); }
+.rosso { color: var(--pericolo); }

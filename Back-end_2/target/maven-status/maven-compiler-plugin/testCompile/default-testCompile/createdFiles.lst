@@ -1,4 +1,6 @@
+com/ilmister/service/MercatoServiceImplTest$OrologioFisso.class
 com/ilmister/service/RosaServiceImplTest.class
+com/ilmister/service/impl/RegoleAllenamentoTest.class
 com/ilmister/controller/SviluppoControllerTest$OrologioFisso.class
 com/ilmister/generazione/GeneratoreCampionatoTest.class
 com/ilmister/service/AuthServiceImplTest$Configurazione.class
@@ -15,8 +17,10 @@ com/ilmister/repository/ClassificaRepositoryTest.class
 com/ilmister/service/FormazioneServiceImplTest.class
 com/ilmister/integrazione/ApiIntegrazioneTest$Sessione.class
 com/ilmister/controller/SviluppoControllerTest.class
+com/ilmister/service/MercatoServiceImplTest.class
 com/ilmister/repository/UtenteERefreshTokenRepositoryTest.class
 com/ilmister/repository/CarrieraRepositoryTest.class
+com/ilmister/service/impl/RegoleMercatoTest.class
 com/ilmister/motore/SquadraInCampoTest.class
 com/ilmister/service/impl/RegoleGiornataTest.class
 com/ilmister/service/RosaServiceImplTest$OrologioFisso.class
@@ -26,6 +30,7 @@ com/ilmister/service/AvanzamentoServiceImplTest$OrologioFisso.class
 com/ilmister/entity/ModuloTest.class
 com/ilmister/motore/CronacaTest.class
 com/ilmister/generazione/CalcolatoreAttributiTest.class
+com/ilmister/service/impl/RegoleEconomiaTest.class
 com/ilmister/entity/PosizioneTest.class
 com/ilmister/security/JwtServiceTest.class
 com/ilmister/service/AvanzamentoServiceImplTest.class

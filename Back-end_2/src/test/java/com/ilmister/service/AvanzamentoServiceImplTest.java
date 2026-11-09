@@ -26,6 +26,7 @@ import com.ilmister.entity.Carriera;
 import com.ilmister.entity.Giocatore;
 import com.ilmister.entity.Utente;
 import com.ilmister.entity.enumerazioni.StatoPartita;
+import com.ilmister.entity.enumerazioni.TipoMovimento;
 import com.ilmister.entity.enumerazioni.StatoStagione;
 import com.ilmister.exception.OperazioneNonValidaException;
 import com.ilmister.exception.RisorsaNonTrovataException;
@@ -35,7 +36,9 @@ import com.ilmister.motore.MotorePartita;
 import com.ilmister.repository.CarrieraRepository;
 import com.ilmister.repository.EventoPartitaRepository;
 import com.ilmister.repository.GiocatoreRepository;
+import com.ilmister.repository.MovimentoFinanziarioRepository;
 import com.ilmister.repository.PartitaRepository;
+import com.ilmister.repository.SquadraRepository;
 import com.ilmister.repository.PrestazioneGiocatoreRepository;
 import com.ilmister.repository.RepositoryTestBase;
 import com.ilmister.repository.StagioneRepository;
@@ -78,6 +81,10 @@ class AvanzamentoServiceImplTest extends RepositoryTestBase {
     private PrestazioneGiocatoreRepository prestazioneGiocatoreRepository;
     @Autowired
     private GiocatoreRepository giocatoreRepository;
+    @Autowired
+    private MovimentoFinanziarioRepository movimentoRepository;
+    @Autowired
+    private SquadraRepository squadraRepository;
 
     private Utente mario;
 
@@ -357,5 +364,91 @@ class AvanzamentoServiceImplTest extends RepositoryTestBase {
         assertThatThrownBy(() -> avanzamentoService.concludiPartita(carriera.getId(), mario.getId(),
                 new DecisioniIntervalloRichiesta(null, List.of(new SostituzioneRichiesta(999_999L, 999_998L)))))
                 .isInstanceOf(OperazioneNonValidaException.class);
+    }
+
+    // ---------- economia e allenamento ----------
+
+    @Test
+    void dopoLaGiornataSiPaganoGliStipendiESiIncassanoIBiglietti() {
+        Carriera carriera = nuovaCarriera(mario, 7);
+        var squadra = squadraRepository.findByCarrieraIdAndAllenataDallUtenteTrue(carriera.getId()).orElseThrow();
+        java.math.BigDecimal budgetPrima = squadra.getBudgetTrasferimenti();
+        java.math.BigDecimal monteStipendi = giocatoreRepository.findBySquadraIdOrderByCognomeAscNomeAsc(squadra.getId())
+                .stream().map(Giocatore::getStipendioAnnuo).reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        avanzamentoService.avanza(carriera.getId(), mario.getId());
+        em.flush();
+        em.clear();
+
+        var movimenti = movimentoRepository.findTop30BySquadraIdOrderByDataMovimentoDescIdDesc(squadra.getId());
+        var stipendi = movimenti.stream().filter(m -> m.getTipo() == TipoMovimento.STIPENDI).toList();
+        assertThat(stipendi).hasSize(1);
+        assertThat(stipendi.get(0).getImporto())
+                .isEqualByComparingTo(monteStipendi.divide(java.math.BigDecimal.valueOf(18), 2, java.math.RoundingMode.HALF_UP).negate());
+        // I biglietti si incassano solo giocando in casa
+        long biglietti = movimenti.stream().filter(m -> m.getTipo() == TipoMovimento.BIGLIETTI).count();
+        assertThat(biglietti).isLessThanOrEqualTo(1);
+        // Il budget cambia esattamente della somma dei movimenti
+        java.math.BigDecimal somma = movimenti.stream().map(m -> m.getImporto()).reduce(java.math.BigDecimal.ZERO,
+                java.math.BigDecimal::add);
+        assertThat(squadraRepository.findById(squadra.getId()).orElseThrow().getBudgetTrasferimenti())
+                .isEqualByComparingTo(budgetPrima.add(somma));
+    }
+
+    @Test
+    void ancheLeSquadreDelComputerPaganoStipendiEIncassano() {
+        Carriera carriera = nuovaCarriera(mario, 7);
+        var squadre = squadraRepository.findByCarrieraId(carriera.getId());
+        var budgetPrima = new java.util.HashMap<Long, java.math.BigDecimal>();
+        squadre.forEach(s -> budgetPrima.put(s.getId(), s.getBudgetTrasferimenti()));
+
+        avanzamentoService.avanza(carriera.getId(), mario.getId());
+        em.flush();
+        em.clear();
+
+        long cambiate = squadraRepository.findByCarrieraId(carriera.getId()).stream()
+                .filter(s -> s.getBudgetTrasferimenti().compareTo(budgetPrima.get(s.getId())) != 0).count();
+        assertThat(cambiate).isEqualTo(10);
+    }
+
+    @Test
+    void conUnaStagioneDiAllenamentoLaSquadraDellUtenteMigliora() {
+        Carriera carriera = nuovaCarriera(mario, 7);
+        var squadra = squadraRepository.findByCarrieraIdAndAllenataDallUtenteTrue(carriera.getId()).orElseThrow();
+        int prima = giocatoreRepository.findBySquadraIdOrderByCognomeAscNomeAsc(squadra.getId()).stream()
+                .mapToInt(Giocatore::getValutazione).sum();
+
+        for (int giornata = 1; giornata <= 18; giornata++) {
+            avanzamentoService.avanza(carriera.getId(), mario.getId());
+            em.flush();
+            em.clear();
+        }
+
+        var rosa = giocatoreRepository.findBySquadraIdOrderByCognomeAscNomeAsc(squadra.getId());
+        assertThat(rosa.stream().mapToInt(Giocatore::getValutazione).sum()).isGreaterThan(prima);
+        assertThat(rosa).allSatisfy(g -> {
+            assertThat(g.getValutazione()).isLessThanOrEqualTo(g.getPotenziale());
+            assertThat(g.getVelocita()).isBetween(1, 99);
+            assertThat(g.getTiro()).isBetween(1, 99);
+        });
+    }
+
+    @Test
+    void soloLaSquadraDellUtenteSiAllena() {
+        Carriera carriera = nuovaCarriera(mario, 7);
+        var altre = squadraRepository.findByCarrieraId(carriera.getId()).stream().filter(s -> !s.isAllenataDallUtente())
+                .map(s -> s.getId()).toList();
+        int prima = giocatoreRepository.findAll().stream().filter(g -> g.getSquadra() != null
+                && altre.contains(g.getSquadra().getId())).mapToInt(Giocatore::getValutazione).sum();
+
+        for (int giornata = 1; giornata <= 6; giornata++) {
+            avanzamentoService.avanza(carriera.getId(), mario.getId());
+            em.flush();
+            em.clear();
+        }
+
+        int dopo = giocatoreRepository.findAll().stream().filter(g -> g.getSquadra() != null
+                && altre.contains(g.getSquadra().getId())).mapToInt(Giocatore::getValutazione).sum();
+        assertThat(dopo).isEqualTo(prima);
     }
 }

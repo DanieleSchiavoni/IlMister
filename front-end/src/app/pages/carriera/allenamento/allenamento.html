@@ -1,0 +1,27 @@
+<section class="scheda">
+  <h2>Allenamento</h2>
+  <p class="tenue">
+    A ogni giornata i giocatori della tua squadra possono migliorare di un punto un attributo legato al focus.
+    Crescono soprattutto i giovani, e nessuno supera il proprio potenziale.
+  </p>
+
+  @if (errore(); as messaggio) {
+    <p class="errore" role="alert">{{ messaggio }}</p>
+  }
+  @if (dati(); as d) {
+    <div class="opzioni" role="radiogroup" aria-label="Focus di allenamento">
+      @for (o of d.opzioni; track o.valore) {
+        <button type="button" class="opzione" role="radio" [attr.aria-checked]="o.valore === d.focus"
+          [class.scelta]="o.valore === d.focus" (click)="scegli(o.valore)">
+          <strong>{{ o.nome }}</strong>
+          <span class="tenue">{{ o.descrizione }}</span>
+        </button>
+      }
+    </div>
+    @if (salvato()) {
+      <p class="ok" role="status">Focus salvato: vale dalla prossima giornata.</p>
+    }
+  } @else if (!errore()) {
+    <p class="tenue">Caricamento...</p>
+  }
+</section>

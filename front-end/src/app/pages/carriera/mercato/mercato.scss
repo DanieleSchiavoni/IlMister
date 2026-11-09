@@ -1,0 +1,15 @@
+.testata { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.viste { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.viste button {
+  background: var(--superficie-2); color: var(--testo); border: 1px solid var(--bordo);
+  border-radius: 999px; padding: 0.4rem 0.9rem; font: inherit; cursor: pointer;
+}
+.viste button.attiva { border-color: var(--primario); color: var(--primario); }
+.esito { background: rgba(47, 191, 113, 0.15); border: 1px solid var(--primario); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.esito.rifiuto { background: rgba(232, 176, 74, 0.12); border-color: var(--avviso); }
+.filtri { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1rem; }
+.filtri .campo { margin-bottom: 0; }
+.scorrevole { overflow-x: auto; padding: 0.5rem; }
+.n { text-align: right; white-space: nowrap; }
+.importo { width: 7rem; text-align: right; }
+.azioni { display: flex; gap: 0.5rem; }

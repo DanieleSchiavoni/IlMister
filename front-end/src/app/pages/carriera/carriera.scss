@@ -19,3 +19,5 @@
 .schede a:hover { color: var(--testo); text-decoration: none; }
 .schede a.attiva { color: var(--primario); border-bottom-color: var(--primario); }
 .azione a.pulsante { text-decoration: none; }
+.schede { overflow-x: auto; }
+.schede a { white-space: nowrap; }

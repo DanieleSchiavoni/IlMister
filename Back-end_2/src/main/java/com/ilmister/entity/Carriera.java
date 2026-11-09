@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
+import com.ilmister.entity.enumerazioni.FocusAllenamento;
 import com.ilmister.entity.enumerazioni.StatoCarriera;
 
 import jakarta.persistence.Column;
@@ -63,6 +64,12 @@ public class Carriera {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(nullable = false, length = 20)
     private StatoCarriera stato = StatoCarriera.IN_CORSO;
+
+    /** Su cosa si allena la squadra dell'utente */
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "focus_allenamento", nullable = false, length = 20)
+    private FocusAllenamento focusAllenamento = FocusAllenamento.EQUILIBRATO;
 
     /** Da questo seme nascono tutti i numeri casuali della carriera: a parità di seme il gioco è ripetibile */
     @Column(nullable = false)

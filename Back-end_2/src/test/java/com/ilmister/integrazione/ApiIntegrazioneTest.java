@@ -313,4 +313,108 @@ class ApiIntegrazioneTest {
         mvc.perform(get("/api/carriere/" + id).header("Authorization", sessione.intestazione()))
                 .andExpect(status().isNotFound());
     }
+
+    // ---------- mercato, finanze, allenamento ----------
+
+    @Test
+    void ilMercatoSenzaTokenDa401() throws Exception {
+        mvc.perform(get("/api/carriere/1/mercato/giocatori")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/carriere/1/finanze")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/carriere/1/allenamento")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void siCompraUnGiocatoreEILeFinanzeLoRegistrano() throws Exception {
+        Sessione sessione = registraEAccedi();
+        long id = creaCarriera(sessione);
+        String base = "/api/carriere/" + id;
+
+        JsonNode elenco = corpo(mvc.perform(get(base + "/mercato/giocatori")
+                .header("Authorization", sessione.intestazione())).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(60))));
+        JsonNode scelto = elenco.get(elenco.size() - 1);
+        double offerta = scelto.get("valoreMercato").asDouble() * 1.5;
+
+        mvc.perform(get(base + "/finanze").header("Authorization", sessione.intestazione()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.movimenti", hasSize(0)))
+                .andExpect(jsonPath("$.giocatori").value(26));
+
+        inviaJson("POST", base + "/mercato/offerte", java.util.Map.of("giocatoreId", scelto.get("id").asLong(),
+                "importo", offerta), sessione.accessToken())
+                .andExpect(status().isOk()).andExpect(jsonPath("$.conclusa").value(true));
+
+        mvc.perform(get(base + "/finanze").header("Authorization", sessione.intestazione()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.giocatori").value(27))
+                .andExpect(jsonPath("$.movimenti", hasSize(1))).andExpect(jsonPath("$.movimenti[0].tipo").value("ACQUISTO"));
+    }
+
+    @Test
+    void unOffertaRifiutataNonESuErrore() throws Exception {
+        Sessione sessione = registraEAccedi();
+        long id = creaCarriera(sessione);
+        String base = "/api/carriere/" + id;
+        JsonNode elenco = corpo(mvc.perform(get(base + "/mercato/giocatori")
+                .header("Authorization", sessione.intestazione())));
+        JsonNode scelto = elenco.get(0);
+
+        inviaJson("POST", base + "/mercato/offerte", java.util.Map.of("giocatoreId", scelto.get("id").asLong(),
+                "importo", 1), sessione.accessToken())
+                .andExpect(status().isOk()).andExpect(jsonPath("$.conclusa").value(false));
+    }
+
+    @Test
+    void unOffertaNonValidaDa400() throws Exception {
+        Sessione sessione = registraEAccedi();
+        long id = creaCarriera(sessione);
+
+        inviaJson("POST", "/api/carriere/" + id + "/mercato/offerte", java.util.Map.of("giocatoreId", 1,
+                "importo", -5), sessione.accessToken()).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void ilMercatoDiUnAltraCarrieraDa404() throws Exception {
+        Sessione proprietario = registraEAccedi();
+        Sessione intruso = registraEAccedi();
+        long id = creaCarriera(proprietario);
+
+        mvc.perform(get("/api/carriere/" + id + "/mercato/giocatori").header("Authorization", intruso.intestazione()))
+                .andExpect(status().isNotFound());
+        mvc.perform(get("/api/carriere/" + id + "/finanze").header("Authorization", intruso.intestazione()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void ilFocusDiAllenamentoSiLeggeESiCambia() throws Exception {
+        Sessione sessione = registraEAccedi();
+        long id = creaCarriera(sessione);
+        String percorso = "/api/carriere/" + id + "/allenamento";
+
+        mvc.perform(get(percorso).header("Authorization", sessione.intestazione()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.focus").value("EQUILIBRATO"))
+                .andExpect(jsonPath("$.opzioni", hasSize(5)));
+
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put(percorso)
+                .header("Authorization", sessione.intestazione()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"focus\":\"FISICO\"}")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.focus").value("FISICO"));
+        mvc.perform(get(percorso).header("Authorization", sessione.intestazione()))
+                .andExpect(jsonPath("$.focus").value("FISICO"));
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put(percorso)
+                .header("Authorization", sessione.intestazione()).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"focus\":\"INESISTENTE\"}")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void dopoUnaGiornataLeFinanzeHannoStipendiEBiglietti() throws Exception {
+        Sessione sessione = registraEAccedi();
+        long id = creaCarriera(sessione);
+        String base = "/api/carriere/" + id;
+
+        mvc.perform(post(base + "/giornata/avanza").header("Authorization", sessione.intestazione()))
+                .andExpect(status().isOk());
+
+        mvc.perform(get(base + "/finanze").header("Authorization", sessione.intestazione()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.movimenti[?(@.tipo=='STIPENDI')]", hasSize(1)))
+                .andExpect(jsonPath("$.usciteTotali").isNumber());
+    }
 }

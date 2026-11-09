@@ -26,6 +26,10 @@
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/AvanzamentoServiceImplTest.java
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/CarrieraServiceImplTest.java
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/FormazioneServiceImplTest.java
+/Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/MercatoServiceImplTest.java
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/RosaServiceImplTest.java
+/Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/impl/RegoleAllenamentoTest.java
+/Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/impl/RegoleEconomiaTest.java
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/impl/RegoleGiornataTest.java
+/Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/impl/RegoleMercatoTest.java
 /Users/danieleschiavoni/CORSO/Progetti/IlMister/Back-end_2/src/test/java/com/ilmister/service/impl/StatoPartitaJsonTest.java

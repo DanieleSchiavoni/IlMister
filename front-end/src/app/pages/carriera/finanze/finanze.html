@@ -1,0 +1,54 @@
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+@if (finanze(); as f) {
+  <div class="riquadri">
+    <div class="scheda riquadro">
+      <span class="tenue">Budget</span>
+      <strong [class.rosso]="f.budget < 0">{{ f.budget | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong>
+    </div>
+    <div class="scheda riquadro">
+      <span class="tenue">Stipendi annui</span>
+      <strong>{{ f.monteStipendiAnnuo | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong>
+    </div>
+    <div class="scheda riquadro">
+      <span class="tenue">Valore della rosa ({{ f.giocatori }})</span>
+      <strong>{{ f.valoreRosa | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong>
+    </div>
+    <div class="scheda riquadro">
+      <span class="tenue">Entrate</span>
+      <strong class="verde">{{ f.entrateTotali | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong>
+    </div>
+    <div class="scheda riquadro">
+      <span class="tenue">Uscite</span>
+      <strong class="rosso">{{ f.usciteTotali | currency: 'EUR' : 'symbol' : '1.0-0' }}</strong>
+    </div>
+  </div>
+
+  <section class="scheda">
+    <h2>Ultimi movimenti</h2>
+    @if (f.movimenti.length === 0) {
+      <p class="tenue">Ancora nessun movimento: gioca una giornata o fai una trattativa.</p>
+    } @else {
+      <div class="scorrevole">
+        <table class="tabella">
+          <thead><tr><th>Data</th><th>Voce</th><th>Descrizione</th><th class="n">Importo</th></tr></thead>
+          <tbody>
+            @for (m of f.movimenti; track m.id) {
+              <tr>
+                <td>{{ m.data | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ etichetta(m.tipo) }}</td>
+                <td>{{ m.descrizione }}</td>
+                <td class="n" [class.verde]="m.importo > 0" [class.rosso]="m.importo < 0">
+                  {{ m.importo | currency: 'EUR' : 'symbol' : '1.0-0' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}
