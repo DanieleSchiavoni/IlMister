@@ -1,0 +1,128 @@
+@if (tempo(); as t) {
+  <section class="scheda tabellone">
+    <p class="tenue">Intervallo</p>
+    <div class="risultato">
+      <span class="casa" [class.mia]="t.utenteInCasa">{{ t.squadraCasa }}</span>
+      <strong class="punteggio">{{ t.golCasa }} - {{ t.golTrasferta }}</strong>
+      <span class="trasferta" [class.mia]="!t.utenteInCasa">{{ t.squadraTrasferta }}</span>
+    </div>
+    <table class="tabella stat">
+      <tbody>
+        <tr><td class="n">{{ t.statisticheCasa.possesso }}%</td><th>Possesso</th><td>{{ t.statisticheTrasferta.possesso }}%</td></tr>
+        <tr><td class="n">{{ t.statisticheCasa.tiri }}</td><th>Tiri</th><td>{{ t.statisticheTrasferta.tiri }}</td></tr>
+        <tr><td class="n">{{ t.statisticheCasa.tiriInPorta }}</td><th>In porta</th><td>{{ t.statisticheTrasferta.tiriInPorta }}</td></tr>
+        <tr><td class="n">{{ t.statisticheCasa.xg }}</td><th>xG</th><td>{{ t.statisticheTrasferta.xg }}</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="due-colonne">
+    <section class="scheda">
+      <h2>Cronaca del primo tempo</h2>
+      <ul class="cronaca">
+        @for (riga of t.cronaca; track $index) {
+          <li>{{ riga }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="scheda">
+      <h2>I tuoi giocatori</h2>
+      <table class="tabella">
+        <thead><tr><th>Giocatore</th><th class="n">En.</th><th class="n">G</th><th class="n">A</th><th></th></tr></thead>
+        <tbody>
+          @for (g of t.giocatoriUtente; track g.giocatoreId) {
+            <tr [class.fuori]="!g.inCampo || g.espulso">
+              <td>{{ g.siglaPosizione }} {{ g.cognome }}
+                @if (g.ammonito) { 🟨 }
+                @if (g.espulso) { 🟥 }
+              </td>
+              <td class="n" [class.stanco]="g.energia < 50">{{ g.energia }}</td>
+              <td class="n">{{ g.gol }}</td>
+              <td class="n">{{ g.assist }}</td>
+              <td class="tenue">{{ g.espulso ? 'espulso' : g.infortunato ? 'infortunato' : g.inCampo ? '' : 'panchina' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <form class="scheda decisioni" (submit)="$event.preventDefault(); gioca()">
+    <h2>Le tue decisioni per il secondo tempo</h2>
+
+    <div class="istruzioni">
+      <div class="campo">
+        <label for="mentalita">Mentalità</label>
+        <select id="mentalita" (change)="cambiaIstruzione('mentalita', $event)">
+          @for (o of mentalita; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === mentalitaScelta()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="pressing">Pressing</label>
+        <select id="pressing" (change)="cambiaIstruzione('pressing', $event)">
+          @for (o of pressing; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === pressingScelto()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="ritmo">Ritmo</label>
+        <select id="ritmo" (change)="cambiaIstruzione('ritmo', $event)">
+          @for (o of ritmo; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === ritmoScelto()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="linea">Linea difensiva</label>
+        <select id="linea" (change)="cambiaIstruzione('linea', $event)">
+          @for (o of lineaDifensiva; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === lineaScelta()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <h3>Cambi <span class="tenue">({{ cambi().length }}/{{ maxCambi }})</span></h3>
+    @for (c of cambi(); track $index) {
+      <div class="cambio">
+        <select [attr.aria-label]="'Esce, cambio ' + ($index + 1)" (change)="scegliCambio($index, 'esce', $event)">
+          <option value="0" [selected]="c.esce === 0">Esce...</option>
+          @for (g of inCampo(); track g.giocatoreId) {
+            <option [value]="g.giocatoreId" [selected]="g.giocatoreId === c.esce"
+              [disabled]="giaScelto(g.giocatoreId, $index, 'esce')">{{ etichetta(g) }}</option>
+          }
+        </select>
+        <span aria-hidden="true">→</span>
+        <select [attr.aria-label]="'Entra, cambio ' + ($index + 1)" (change)="scegliCambio($index, 'entra', $event)">
+          <option value="0" [selected]="c.entra === 0">Entra...</option>
+          @for (g of inPanchina(); track g.giocatoreId) {
+            <option [value]="g.giocatoreId" [selected]="g.giocatoreId === c.entra"
+              [disabled]="giaScelto(g.giocatoreId, $index, 'entra')">{{ etichetta(g) }}</option>
+          }
+        </select>
+        <button class="pulsante secondario" type="button" (click)="rimuoviCambio($index)"
+          [attr.aria-label]="'Togli il cambio ' + ($index + 1)">✕</button>
+      </div>
+    }
+    <button class="pulsante secondario" type="button" (click)="aggiungiCambio()" [disabled]="!puoAggiungere()">
+      Aggiungi un cambio
+    </button>
+
+    @if (errore(); as messaggio) {
+      <p class="errore" role="alert">{{ messaggio }}</p>
+    }
+    <div class="azioni">
+      <button class="pulsante" type="submit" [disabled]="inCorso() || !cambiValidi()">
+        {{ inCorso() ? 'Si gioca...' : 'Gioca il secondo tempo' }}
+      </button>
+    </div>
+  </form>
+} @else if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+} @else {
+  <p class="tenue">Si gioca il primo tempo...</p>
+}

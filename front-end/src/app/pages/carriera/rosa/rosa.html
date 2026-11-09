@@ -1,0 +1,32 @@
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+@if (giocatori(); as elenco) {
+  <div class="scheda scorrevole">
+    <table class="tabella">
+      <thead>
+        <tr>
+          <th class="n">N°</th><th>Giocatore</th><th>Ruolo</th><th class="n">Età</th><th class="n">Val.</th>
+          <th class="n">Forma</th><th class="n">Morale</th><th class="n">Energia</th><th>Stato</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (g of elenco; track g.id) {
+          <tr [class.non-disponibile]="!g.disponibile">
+            <td class="n">{{ g.numeroMaglia ?? '-' }}</td>
+            <td>{{ g.nome }} {{ g.cognome }}</td>
+            <td>{{ g.siglaPosizione }}</td>
+            <td class="n">{{ g.eta }}</td>
+            <td class="n"><strong>{{ g.valutazione }}</strong></td>
+            <td class="n">{{ g.forma }}</td>
+            <td class="n">{{ g.morale }}</td>
+            <td class="n">{{ g.energia }}</td>
+            <td>{{ descrizioneStato(g) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}

@@ -57,7 +57,7 @@ export class NuovaCarriera {
     this.servizio
       .crea({ nome: nome.trim(), nomeAllenatore: nomeAllenatore.trim(), nomeSquadra: squadra, seme: this.seme() })
       .subscribe({
-        next: () => this.router.navigate(['/carriere']),
+        next: (creata) => this.router.navigate(['/carriere', creata.id]),
         error: (e: unknown) => {
           this.errore.set(messaggioErrore(e));
           this.inCorso.set(false);

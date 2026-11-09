@@ -1,0 +1,21 @@
+.testata { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.testata p { margin: 0; }
+.azione { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+.risultati { margin-bottom: 1rem; }
+.risultati .titolo { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.risultati ul { list-style: none; margin: 0; padding: 0; }
+.risultati li a {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; padding: 0.45rem 0.5rem;
+  color: var(--testo); border-bottom: 1px solid var(--bordo);
+}
+.risultati li a:hover { background: var(--superficie-2); text-decoration: none; }
+.risultati li.mia a { background: rgba(47, 191, 113, 0.15); }
+.casa { text-align: right; }
+.punteggio { min-width: 4rem; text-align: center; }
+
+.schede { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--bordo); margin-bottom: 1rem; }
+.schede a { padding: 0.6rem 1rem; color: var(--testo-tenue); border-bottom: 2px solid transparent; }
+.schede a:hover { color: var(--testo); text-decoration: none; }
+.schede a.attiva { color: var(--primario); border-bottom-color: var(--primario); }
+.azione a.pulsante { text-decoration: none; }

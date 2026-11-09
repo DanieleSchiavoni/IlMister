@@ -1,0 +1,7 @@
+.istruzioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0 1rem; }
+.posti { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0 1rem; }
+.panchina { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.4rem 1rem; margin-bottom: 1rem; }
+.voce { display: flex; align-items: center; gap: 0.5rem; }
+.voce.spento { color: var(--testo-tenue); }
+.ok { color: var(--primario); }
+select { width: 100%; }

@@ -33,7 +33,10 @@
             </dd>
             <dt>Fiducia presidente</dt><dd>{{ carriera.fiduciaPresidente }}%</dd>
           </dl>
-          <button class="pulsante pericolo" type="button" (click)="elimina(carriera)">Elimina</button>
+          <div class="azioni">
+            <a class="pulsante" [routerLink]="['/carriere', carriera.id]">Apri</a>
+            <button class="pulsante pericolo" type="button" (click)="elimina(carriera)">Elimina</button>
+          </div>
         </article>
       }
     </div>

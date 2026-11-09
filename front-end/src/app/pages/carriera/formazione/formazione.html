@@ -1,0 +1,92 @@
+@if (caricata()) {
+  <form class="scheda" (submit)="$event.preventDefault(); salva()">
+    <h2>Formazione</h2>
+
+    <div class="istruzioni">
+      <div class="campo">
+        <label for="modulo">Modulo</label>
+        <select id="modulo" (change)="cambiaModulo($event)">
+          @for (m of moduli; track m.valore) {
+            <option [value]="m.valore" [selected]="m.valore === modulo()">{{ m.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="mentalita">Mentalità</label>
+        <select id="mentalita" (change)="cambiaIstruzione('mentalita', $event)">
+          @for (o of mentalita; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === mentalitaScelta()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="pressing">Pressing</label>
+        <select id="pressing" (change)="cambiaIstruzione('pressing', $event)">
+          @for (o of pressing; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === pressingScelto()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="ritmo">Ritmo</label>
+        <select id="ritmo" (change)="cambiaIstruzione('ritmo', $event)">
+          @for (o of ritmo; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === ritmoScelto()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+      <div class="campo">
+        <label for="linea">Linea difensiva</label>
+        <select id="linea" (change)="cambiaIstruzione('linea', $event)">
+          @for (o of lineaDifensiva; track o.valore) {
+            <option [value]="o.valore" [selected]="o.valore === lineaScelta()">{{ o.nome }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <h3>Titolari</h3>
+    <p class="tenue">Il primo posto è il portiere. Cambiando modulo i giocatori restano nei posti: controllali.</p>
+    <div class="posti">
+      @for (posto of posti(); track $index) {
+        <div class="campo">
+          <label [for]="'posto' + $index">{{ posto }}</label>
+          <select [id]="'posto' + $index" (change)="cambiaTitolare($index, $event)">
+            <option value="" [selected]="titolari()[$index] === null">- scegli -</option>
+            @for (g of rosa(); track g.id) {
+              <option [value]="g.id" [selected]="g.id === titolari()[$index]" [disabled]="nonSceglibile(g, $index)">
+                {{ etichetta(g) }}
+              </option>
+            }
+          </select>
+        </div>
+      }
+    </div>
+
+    <h3>Panchina <span class="tenue">({{ panchina().length }}/{{ maxPanchina }})</span></h3>
+    <div class="panchina">
+      @for (g of disponibiliPerPanchina(); track g.id) {
+        <label class="voce" [class.spento]="!g.disponibile">
+          <input type="checkbox" [checked]="inPanchina(g.id)" (change)="cambiaPanchina(g, $event)"
+            [disabled]="!g.disponibile || (!inPanchina(g.id) && panchina().length >= maxPanchina)">
+          {{ etichetta(g) }}
+        </label>
+      }
+    </div>
+
+    @if (errore(); as messaggio) {
+      <p class="errore" role="alert">{{ messaggio }}</p>
+    }
+    @if (salvata()) {
+      <p class="ok" role="status">Formazione salvata: la useranno le prossime partite.</p>
+    }
+    <button class="pulsante" type="submit" [disabled]="!valida() || inCorso()">Salva la formazione</button>
+    @if (!valida()) {
+      <span class="tenue"> Servono 11 titolari diversi.</span>
+    }
+  </form>
+} @else if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+} @else {
+  <p class="tenue">Caricamento...</p>
+}

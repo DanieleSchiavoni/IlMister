@@ -1,0 +1,33 @@
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+@if (righe(); as elenco) {
+  <div class="scheda scorrevole">
+    <table class="tabella">
+      <thead>
+        <tr>
+          <th>#</th><th>Squadra</th><th class="n">G</th><th class="n">V</th><th class="n">N</th><th class="n">P</th>
+          <th class="n">GF</th><th class="n">GS</th><th class="n">DR</th><th class="n">Pt</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of elenco; track r.squadraId) {
+          <tr [class.mia]="r.dellUtente">
+            <td>{{ r.posizione }}</td>
+            <td>{{ r.squadra }}</td>
+            <td class="n">{{ r.giocate }}</td>
+            <td class="n">{{ r.vittorie }}</td>
+            <td class="n">{{ r.pareggi }}</td>
+            <td class="n">{{ r.sconfitte }}</td>
+            <td class="n">{{ r.golFatti }}</td>
+            <td class="n">{{ r.golSubiti }}</td>
+            <td class="n">{{ r.differenzaReti > 0 ? '+' + r.differenzaReti : r.differenzaReti }}</td>
+            <td class="n punti">{{ r.punti }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}

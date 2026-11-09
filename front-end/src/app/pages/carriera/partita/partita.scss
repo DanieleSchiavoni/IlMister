@@ -1,0 +1,14 @@
+.indietro { display: inline-block; margin-bottom: 0.75rem; }
+.blocco { margin-top: 1rem; }
+.risultato { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; font-size: 1.3rem; }
+.casa { text-align: right; }
+.punteggio { font-size: 2rem; text-align: center; }
+.n { text-align: right; }
+.stat th { text-align: center; color: var(--testo-tenue); font-weight: 500; }
+.stat td:first-child { text-align: right; }
+.cronaca { list-style: none; margin: 0; padding: 0; }
+.cronaca li { display: flex; gap: 0.75rem; padding: 0.3rem 0; border-bottom: 1px solid var(--bordo); }
+.cronaca li.gol { font-weight: 700; color: var(--primario); }
+.minuto { min-width: 3.5rem; color: var(--testo-tenue); }
+.due-colonne { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 800px) { .due-colonne { grid-template-columns: 1fr; } }

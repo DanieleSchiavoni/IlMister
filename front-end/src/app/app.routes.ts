@@ -23,6 +23,35 @@ export const routes: Routes = [
     canActivate: [guardAutenticato],
     loadComponent: () => import('./pages/nuova-carriera/nuova-carriera').then((m) => m.NuovaCarriera),
   },
+  {
+    path: 'carriere/:id',
+    canActivate: [guardAutenticato],
+    loadComponent: () => import('./pages/carriera/carriera').then((m) => m.CarrieraPagina),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'classifica' },
+      {
+        path: 'classifica',
+        loadComponent: () => import('./pages/carriera/classifica/classifica').then((m) => m.Classifica),
+      },
+      {
+        path: 'calendario',
+        loadComponent: () => import('./pages/carriera/calendario/calendario').then((m) => m.Calendario),
+      },
+      {
+        path: 'formazione',
+        loadComponent: () => import('./pages/carriera/formazione/formazione').then((m) => m.Formazione),
+      },
+      {
+        path: 'intervallo',
+        loadComponent: () => import('./pages/carriera/intervallo/intervallo').then((m) => m.Intervallo),
+      },
+      { path: 'rosa', loadComponent: () => import('./pages/carriera/rosa/rosa').then((m) => m.Rosa) },
+      {
+        path: 'partite/:partitaId',
+        loadComponent: () => import('./pages/carriera/partita/partita').then((m) => m.Partita),
+      },
+    ],
+  },
   { path: '', pathMatch: 'full', redirectTo: 'carriere' },
   { path: '**', redirectTo: 'carriere' },
 ];

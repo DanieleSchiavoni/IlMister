@@ -4,3 +4,5 @@
 dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 1rem; margin: 0 0 1rem; }
 dt { color: var(--testo-tenue); }
 dd { margin: 0; text-align: right; }
+.azioni { display: flex; gap: 0.5rem; }
+.azioni a.pulsante { text-decoration: none; }

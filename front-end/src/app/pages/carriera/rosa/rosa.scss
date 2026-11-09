@@ -1,0 +1,4 @@
+.scorrevole { overflow-x: auto; padding: 0.5rem; }
+.n { text-align: right; }
+tr.non-disponibile { color: var(--testo-tenue); }
+tr.non-disponibile td:last-child { color: var(--avviso); }

@@ -1,0 +1,74 @@
+<a [routerLink]="['/carriere', stato.id, 'calendario']" class="indietro">‹ Torna al calendario</a>
+
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+@if (partita(); as p) {
+  <section class="scheda tabellone">
+    <p class="tenue">Giornata {{ p.giornata }} · {{ p.data | date: 'dd/MM/yyyy' }} · {{ p.stadio }}
+      @if (p.spettatori) { · {{ p.spettatori }} spettatori }
+    </p>
+    <div class="risultato">
+      <span class="casa">{{ p.squadraCasa }}</span>
+      <strong class="punteggio">{{ p.golCasa }} - {{ p.golTrasferta }}</strong>
+      <span class="trasferta">{{ p.squadraTrasferta }}</span>
+    </div>
+  </section>
+
+  @if (p.statistiche.length === 2) {
+    <section class="scheda blocco">
+      <h2>Statistiche</h2>
+      <table class="tabella stat">
+        <tbody>
+          <tr><td class="n">{{ p.statistiche[0].possesso }}%</td><th>Possesso</th><td>{{ p.statistiche[1].possesso }}%</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].tiri }}</td><th>Tiri</th><td>{{ p.statistiche[1].tiri }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].tiriInPorta }}</td><th>In porta</th><td>{{ p.statistiche[1].tiriInPorta }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].xg }}</td><th>xG</th><td>{{ p.statistiche[1].xg }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].falli }}</td><th>Falli</th><td>{{ p.statistiche[1].falli }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].calciDAngolo }}</td><th>Angoli</th><td>{{ p.statistiche[1].calciDAngolo }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].ammonizioni }}</td><th>Ammonizioni</th><td>{{ p.statistiche[1].ammonizioni }}</td></tr>
+          <tr><td class="n">{{ p.statistiche[0].espulsioni }}</td><th>Espulsioni</th><td>{{ p.statistiche[1].espulsioni }}</td></tr>
+        </tbody>
+      </table>
+    </section>
+  }
+
+  <section class="scheda blocco">
+    <h2>Cronaca</h2>
+    <ul class="cronaca">
+      @for (e of p.cronaca; track $index) {
+        <li [class.gol]="eGol(e.tipo)">
+          <span class="minuto">{{ minuto(e.minuto, e.minutoRecupero) }}</span>
+          <span>{{ e.testo }}</span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <div class="due-colonne">
+    @for (squadra of squadre(p); track squadra.id) {
+      <section class="scheda blocco">
+        <h2>{{ squadra.nome }}</h2>
+        <table class="tabella">
+          <thead><tr><th>Giocatore</th><th class="n">Min</th><th class="n">G</th><th class="n">A</th><th class="n">Voto</th></tr></thead>
+          <tbody>
+            @for (x of prestazioni(p, squadra.id); track x.giocatoreId) {
+              <tr>
+                <td>{{ x.siglaPosizione }} {{ x.giocatore }}
+                  @if (x.ammonito) { 🟨 }
+                  @if (x.espulso) { 🟥 }
+                </td>
+                <td class="n">{{ x.minutiGiocati }}'</td>
+                <td class="n">{{ x.gol }}</td>
+                <td class="n">{{ x.assist }}</td>
+                <td class="n"><strong>{{ x.voto ?? '-' }}</strong></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+  </div>
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}

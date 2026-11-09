@@ -6,8 +6,8 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-const èRottaAuth = (url: string) => url.includes('/api/auth/');
-const èRottaApi = (url: string) => url.startsWith(`${environment.apiUrl}/api/`) || url.startsWith('/api/');
+const eRottaAuth = (url: string) => url.includes('/api/auth/');
+const eRottaApi = (url: string) => url.startsWith(`${environment.apiUrl}/api/`) || url.startsWith('/api/');
 
 function conToken(richiesta: HttpRequest<unknown>, token: string | null): HttpRequest<unknown> {
   return token ? richiesta.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : richiesta;
@@ -21,7 +21,7 @@ export const interceptorAutenticazione: HttpInterceptorFn = (richiesta, avanti) 
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (!èRottaApi(richiesta.url) || èRottaAuth(richiesta.url)) {
+  if (!eRottaApi(richiesta.url) || eRottaAuth(richiesta.url)) {
     return avanti(richiesta);
   }
 

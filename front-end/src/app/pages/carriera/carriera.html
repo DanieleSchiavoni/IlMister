@@ -1,0 +1,61 @@
+@if (stato.carriera(); as c) {
+  <header class="scheda testata">
+    <div>
+      <h1>{{ c.nome }}</h1>
+      <p class="tenue">{{ c.squadra }} · {{ c.campionato }} · stagione {{ c.stagione }}</p>
+      <p class="tenue">{{ c.dataCorrente | date: 'dd/MM/yyyy' }} · fiducia del presidente {{ c.fiduciaPresidente }}%</p>
+    </div>
+    <div class="azione">
+      @if (c.prossimaGiornata) {
+        <span class="tenue">Prossima: giornata {{ c.prossimaGiornata }} di {{ c.giornateTotali }}</span>
+        <a class="pulsante" [routerLink]="['/carriere', stato.id, 'intervallo']">Segui la partita</a>
+        <button class="pulsante secondario" type="button" (click)="gioca()" [disabled]="inCorso()">
+          {{ inCorso() ? 'Si gioca...' : 'Simula la giornata' }}
+        </button>
+      } @else {
+        <strong>Stagione conclusa</strong>
+      }
+    </div>
+  </header>
+
+  @if (erroreGiocata(); as messaggio) {
+    <p class="errore" role="alert">{{ messaggio }}</p>
+  }
+
+  @if (stato.ultima(); as giornata) {
+    <section class="scheda risultati">
+      <div class="titolo">
+        <h2>Risultati della giornata {{ giornata.numero }}</h2>
+        <button class="pulsante secondario" type="button" (click)="chiudiRisultati()">Chiudi</button>
+      </div>
+      <ul>
+        @for (r of giornata.risultati; track r.partitaId) {
+          <li [class.mia]="r.dellUtente">
+            <a [routerLink]="['/carriere', stato.id, 'partite', r.partitaId]">
+              <span class="casa">{{ r.squadraCasa }}</span>
+              <strong class="punteggio">{{ r.golCasa }} - {{ r.golTrasferta }}</strong>
+              <span class="trasferta">{{ r.squadraTrasferta }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+      @if (giornata.stagioneConclusa) {
+        <p><strong>La stagione è finita!</strong></p>
+      }
+    </section>
+  }
+
+  <nav class="schede" aria-label="Sezioni della carriera">
+    <a routerLink="classifica" routerLinkActive="attiva">Classifica</a>
+    <a routerLink="calendario" routerLinkActive="attiva">Calendario</a>
+    <a routerLink="rosa" routerLinkActive="attiva">Rosa</a>
+    <a routerLink="formazione" routerLinkActive="attiva">Formazione</a>
+  </nav>
+
+  <router-outlet />
+} @else if (stato.errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+  <a class="pulsante secondario" routerLink="/carriere">Torna alle carriere</a>
+} @else {
+  <p class="tenue">Caricamento...</p>
+}

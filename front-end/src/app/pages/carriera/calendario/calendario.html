@@ -1,0 +1,35 @@
+@if (errore(); as messaggio) {
+  <p class="errore" role="alert">{{ messaggio }}</p>
+}
+@if (giornata(); as g) {
+  <div class="scheda">
+    <div class="navigazione">
+      <button class="pulsante secondario" type="button" (click)="vai(-1)" [disabled]="g.numero <= 1"
+        aria-label="Giornata precedente">‹</button>
+      <h2>Giornata {{ g.numero }} <span class="tenue">· {{ g.data | date: 'dd/MM/yyyy' }}</span></h2>
+      <button class="pulsante secondario" type="button" (click)="vai(1)" [disabled]="g.numero >= totale()"
+        aria-label="Giornata successiva">›</button>
+    </div>
+    <ul>
+      @for (p of g.partite; track p.id) {
+        <li [class.mia]="p.dellUtente">
+          @if (p.stato === 'CONCLUSA') {
+            <a [routerLink]="['/carriere', stato.id, 'partite', p.id]">
+              <span class="casa">{{ p.squadraCasa }}</span>
+              <strong class="punteggio">{{ p.golCasa }} - {{ p.golTrasferta }}</strong>
+              <span class="trasferta">{{ p.squadraTrasferta }}</span>
+            </a>
+          } @else {
+            <div class="riga">
+              <span class="casa">{{ p.squadraCasa }}</span>
+              <span class="punteggio tenue">{{ p.stato === 'INTERVALLO' ? 'intervallo' : 'vs' }}</span>
+              <span class="trasferta">{{ p.squadraTrasferta }}</span>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+} @else if (!errore()) {
+  <p class="tenue">Caricamento...</p>
+}
